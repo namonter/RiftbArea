@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riftbound Local Card Shop</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f4f6;
+      color: #222;
+    }
+
+    header {
+      background: #1f1f2e;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    nav {
+      background: #2d2d44;
+      padding: 12px;
+      text-align: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 30px auto;
+    }
+
+    .search-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-section input,
+    .search-section select {
+      padding: 12px;
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .search-section button {
+      padding: 12px 20px;
+      background: #5b4bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .search-section button:hover {
+      background: #4638d8;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+    }
+
+    .card-item {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .card-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-item img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .card-info {
+      padding: 15px;
+    }
+
+    .card-info h3 {
+      margin-bottom: 8px;
+      color: #1f1f2e;
+    }
+
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2f8f46;
+      margin: 8px 0;
+    }
+
+    .stock {
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .in-stock {
+      color: #2f8f46;
+    }
+
+    .out-stock {
+      color: #c0392b;
+    }
+
+    .buy-button {
+      width: 100%;
+      padding: 10px;
+      background: #1f1f2e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .buy-button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    footer {
+      margin-top: 40px;
+      background: #1f1f2e;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Riftbound Local Card Shop</h1>
+    <p>Buy, search, and check availability for local Riftbound cards</p>
+  </header>
+
+  <nav>
+    <a href="#">Home</a>
+    <a href="#cards">Cards</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <main class="container">
+    <section class="search-section">
+      <input type="text" id="searchInput" placeholder="Search card name..." />
+
+      <select id="availabilityFilter">
+        <option value="all">All Cards</option>
+        <option value="available">Available Only</option>
+        <option value="soldout">Sold Out</option>
+      </select>
+
+      <button onclick="searchCards()">Search</button>
+    </section>
+
+    <section id="cards" class="card-grid"></section>
+  </main>
+
+  <footer id="contact">
+    <p>Contact: your_email@example.com</p>
+    <p>Local pickup or message to reserve cards.</p>
+  </footer>
+
+  <script>
+    // Temporary sample data.
+    // Later, replace this with data from your database API.
+    let cards = [
+      {
+        name: "Jinx Champion Card",
+        image: "images/jinx-card.jpg",
+        price: 12.99,
+        quantity: 3,
+        rarity: "Legend"
+      },
+      {
+        name: "Yasuo Champion Card",
+        image: "images/yasuo-card.jpg",
+        price: 9.99,
+        quantity: 0,
+        rarity: "Legend"
+      },
+      {
+        name: "Battlefield Card",
+        image: "images/battlefield-card.jpg",
+        price: 3.50,
+        quantity: 6,
+        rarity: "Common"
+      }
+    ];
+
+    function displayCards(cardList) {
+      const cardGrid = document.getElementById("cards");
+      cardGrid.innerHTML = "";
+
+      if (cardList.length === 0) {
+        cardGrid.innerHTML = "<p>No cards found.</p>";
+        return;
+      }
+
+      cardList.forEach(card => {
+        const isAvailable = card.quantity > 0;
+
+        const cardHTML = `
+          <div class="card-item">
+            <img src="${card.image}" alt="${card.name}" />
+            <div class="card-info">
+              <h3>${card.name}</h3>
+              <p>Rarity: ${card.rarity}</p>
+              <p class="price">$${card.price.toFixed(2)}</p>
+              <p class="stock ${isAvailable ? "in-stock" : "out-stock"}">
+                ${isAvailable ? `In Stock: ${card.quantity}` : "Sold Out"}
+              </p>
+              <button class="buy-button" ${isAvailable ? "" : "disabled"} onclick="reserveCard('${card.name}')">
+                ${isAvailable ? "Reserve Card" : "Unavailable"}
+              </button>
+            </div>
+          </div>
+        `;
+
+        cardGrid.innerHTML += cardHTML;
+      });
+    }
+
+    function searchCards() {
+      const searchText = document.getElementById("searchInput").value.toLowerCase();
+      const availability = document.getElementById("availabilityFilter").value;
+
+      let filteredCards = cards.filter(card =>
+        card.name.toLowerCase().includes(searchText)
+      );
+
+      if (availability === "available") {
+        filteredCards = filteredCards.filter(card => card.quantity > 0);
+      } else if (availability === "soldout") {
+        filteredCards = filteredCards.filter(card => card.quantity === 0);
+      }
+
+      displayCards(filteredCards);
+    }
+
+    function reserveCard(cardName) {
+      alert(`Reservation request for: ${cardName}`);
+      // Later, send this to your backend/database.
+    }
+
+    // Example backend fetch for later:
+    // async function loadCardsFromDatabase() {
+    //   const response = await fetch("/api/cards");
+    //   cards = await response.json();
+    //   displayCards(cards);
+    // }
+
+    displayCards(cards);
+  </script>
+</body>
+</html>
